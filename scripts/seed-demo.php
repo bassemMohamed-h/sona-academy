@@ -6,6 +6,13 @@
  * Safe to re-run — every item is looked up before it is created.
  *
  *   docker compose exec -T wordpress php < scripts/seed-demo.php
+ *
+ * On the server (production compose files):
+ *   docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T wordpress php < scripts/seed-demo.php
+ *
+ * The demo student ("student" / "student", with sample progress) is only created
+ * when asked for — never do this on a public site:
+ *   docker compose exec -T -e SONA_DEMO_STUDENT=1 wordpress php < scripts/seed-demo.php
  */
 
 define('WP_USE_THEMES', false);
@@ -109,8 +116,12 @@ function sona_logo_on(int $w, int $h, string $bg, float $scale, bool $mirror = f
 // ---------------------------------------------------------------------------
 // Branding
 // ---------------------------------------------------------------------------
-update_option('blogname', 'السنة أكاديمي');
-update_option('blogdescription', 'أكاديمية لتعلّم أساسيات الإسلام');
+if (trim((string) get_option('blogname')) === '') {
+    update_option('blogname', 'السنة أكاديمي');
+}
+if (trim((string) get_option('blogdescription')) === '') {
+    update_option('blogdescription', 'أكاديمية لتعلّم أساسيات الإسلام');
+}
 
 $logo_id = sona_upsert_image('logo-v2', get_stylesheet_directory() . '/assets/img/logo.png', 'sona-logo.png', 'شعار السنة أكاديمي');
 set_theme_mod('custom_logo', $logo_id);
@@ -397,80 +408,107 @@ set_theme_mod('nav_menu_locations', $locations);
 say('✓ Menu assigned to the header');
 
 // ---------------------------------------------------------------------------
+// Pretty permalinks (Tutor's dashboard and course URLs need them)
+// ---------------------------------------------------------------------------
+if (get_option('permalink_structure') === '') {
+    update_option('permalink_structure', '/%postname%/');
+}
+require_once ABSPATH . 'wp-admin/includes/misc.php';
+$htaccess = ABSPATH . '.htaccess';
+if (!str_contains((string) @file_get_contents($htaccess), 'RewriteRule . /index.php')) {
+    insert_with_markers($htaccess, 'WordPress', [
+        '<IfModule mod_rewrite.c>',
+        'RewriteEngine On',
+        'RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]',
+        'RewriteBase /',
+        'RewriteRule ^index\\.php$ - [L]',
+        'RewriteCond %{REQUEST_FILENAME} !-f',
+        'RewriteCond %{REQUEST_FILENAME} !-d',
+        'RewriteRule . /index.php [L]',
+        '</IfModule>',
+    ]);
+}
+say('✓ Permalinks: /%postname%/');
+
+// ---------------------------------------------------------------------------
 // Demo student with progress
 // ---------------------------------------------------------------------------
-$student = get_user_by('login', 'student');
-if (!$student) {
-    $student_id = wp_insert_user([
-        'user_login'   => 'student',
-        'user_pass'    => 'student',
-        'user_email'   => 'student@example.com',
-        'display_name' => 'عبد الله أحمد',
-        'first_name'   => 'عبد الله',
-        'last_name'    => 'أحمد',
-        'role'         => 'subscriber',
-        'locale'       => 'ar',
-    ]);
-    if (is_wp_error($student_id)) {
-        fwrite(STDERR, 'Student creation failed: ' . $student_id->get_error_message() . "\n");
-        exit(1);
+if (getenv('SONA_DEMO_STUDENT')) {
+    $student = get_user_by('login', 'student');
+    if (!$student) {
+        $student_id = wp_insert_user([
+            'user_login'   => 'student',
+            'user_pass'    => 'student',
+            'user_email'   => 'student@example.com',
+            'display_name' => 'عبد الله أحمد',
+            'first_name'   => 'عبد الله',
+            'last_name'    => 'أحمد',
+            'role'         => 'subscriber',
+            'locale'       => 'ar',
+        ]);
+        if (is_wp_error($student_id)) {
+            fwrite(STDERR, 'Student creation failed: ' . $student_id->get_error_message() . "\n");
+            exit(1);
+        }
+    } else {
+        $student_id = $student->ID;
     }
+    update_user_meta($student_id, 'sona_translation_lang', 'English');
+    update_user_meta($student_id, User::TOUR_COMPLETED_META, 1);
+
+    // slug => [lessons completed, quiz score or null]
+    $progress = [
+        'aqeedah' => [3, 100],
+        'tafsir'  => [3, 75],
+        'hadith'  => [3, 75],
+        'seerah'  => [2, null],
+        'fiqh'    => [1, null],
+    ];
+
+    foreach ($courses as $slug => $c) {
+        EnrollmentModel::do_enroll($c['id'], 0, $student_id);
+
+        [$done, $score] = $progress[$slug] ?? [0, null];
+        foreach (array_slice($c['lessons'], 0, $done) as $lesson_id) {
+            if (!get_user_meta($student_id, '_tutor_completed_lesson_id_' . $lesson_id, true)) {
+                LessonModel::mark_lesson_complete($lesson_id, $student_id);
+            }
+        }
+
+        if ($score !== null) {
+            $has_attempt = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->prefix}tutor_quiz_attempts WHERE quiz_id = %d AND user_id = %d",
+                $c['quiz'],
+                $student_id
+            ));
+            if (!$has_attempt) {
+                $now = current_time('mysql');
+                $wpdb->insert("{$wpdb->prefix}tutor_quiz_attempts", [
+                    'course_id'                => $c['id'],
+                    'quiz_id'                  => $c['quiz'],
+                    'user_id'                  => $student_id,
+                    'total_questions'          => 4,
+                    'total_answered_questions' => 4,
+                    'total_marks'              => 100,
+                    'earned_marks'             => $score,
+                    'attempt_info'             => maybe_serialize(get_post_meta($c['quiz'], 'tutor_quiz_option', true)),
+                    'attempt_status'           => 'attempt_ended',
+                    'attempt_ip'               => '127.0.0.1',
+                    'attempt_started_at'       => $now,
+                    'attempt_ended_at'         => $now,
+                    'is_manually_reviewed'     => 0,
+                    'result'                   => $score >= 60 ? 'pass' : 'fail',
+                ]);
+            }
+            if (!tutor_utils()->is_completed_course($c['id'], $student_id)) {
+                CourseModel::mark_course_as_completed($c['id'], $student_id);
+            }
+        }
+    }
+    say("✓ Demo student: login \"student\" / password \"student\", enrolled in all subjects with sample progress");
 } else {
-    $student_id = $student->ID;
+    say('– Demo student skipped (add -e SONA_DEMO_STUDENT=1 to create it; local demos only)');
 }
-update_user_meta($student_id, 'sona_translation_lang', 'English');
-update_user_meta($student_id, User::TOUR_COMPLETED_META, 1);
-
-// slug => [lessons completed, quiz score or null]
-$progress = [
-    'aqeedah' => [3, 100],
-    'tafsir'  => [3, 75],
-    'hadith'  => [3, 75],
-    'seerah'  => [2, null],
-    'fiqh'    => [1, null],
-];
-
-foreach ($courses as $slug => $c) {
-    EnrollmentModel::do_enroll($c['id'], 0, $student_id);
-
-    [$done, $score] = $progress[$slug] ?? [0, null];
-    foreach (array_slice($c['lessons'], 0, $done) as $lesson_id) {
-        if (!get_user_meta($student_id, '_tutor_completed_lesson_id_' . $lesson_id, true)) {
-            LessonModel::mark_lesson_complete($lesson_id, $student_id);
-        }
-    }
-
-    if ($score !== null) {
-        $has_attempt = (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM {$wpdb->prefix}tutor_quiz_attempts WHERE quiz_id = %d AND user_id = %d",
-            $c['quiz'],
-            $student_id
-        ));
-        if (!$has_attempt) {
-            $now = current_time('mysql');
-            $wpdb->insert("{$wpdb->prefix}tutor_quiz_attempts", [
-                'course_id'                => $c['id'],
-                'quiz_id'                  => $c['quiz'],
-                'user_id'                  => $student_id,
-                'total_questions'          => 4,
-                'total_answered_questions' => 4,
-                'total_marks'              => 100,
-                'earned_marks'             => $score,
-                'attempt_info'             => maybe_serialize(get_post_meta($c['quiz'], 'tutor_quiz_option', true)),
-                'attempt_status'           => 'attempt_ended',
-                'attempt_ip'               => '127.0.0.1',
-                'attempt_started_at'       => $now,
-                'attempt_ended_at'         => $now,
-                'is_manually_reviewed'     => 0,
-                'result'                   => $score >= 60 ? 'pass' : 'fail',
-            ]);
-        }
-        if (!tutor_utils()->is_completed_course($c['id'], $student_id)) {
-            CourseModel::mark_course_as_completed($c['id'], $student_id);
-        }
-    }
-}
-say("✓ Demo student: login \"student\" / password \"student\", enrolled in all subjects with sample progress");
 
 flush_rewrite_rules(false); // soft: a hard flush from the CLI blanks .htaccess
 say('Done. Open ' . home_url('/'));
