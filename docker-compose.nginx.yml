@@ -1,0 +1,6 @@
+# SERVER ONLY (Nginx version) — use INSTEAD of docker-compose.prod.yml
+# WordPress is reachable only from the server itself; Nginx on the host proxies to it
+services:
+  wordpress:
+    ports:
+      - "127.0.0.1:8081:80"
