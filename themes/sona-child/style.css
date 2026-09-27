@@ -1,8 +1,342 @@
 /*
 Theme Name: Sona Child
 Template: astra
-Version: 1.0.0
+Version: 1.1.0
 Text Domain: sona-child
 */
 
-/* Palm palette: white 50%, green 30%, black 20% — add your styles below */
+/* ==========================================================================
+   Palm palette: white 50%, green 30%, black 20%
+   ========================================================================== */
+:root {
+    --sona-white: #ffffff;
+    --sona-black: #000000;
+    --sona-green: #2F7D32;
+    --sona-green-dark: #1C4A24;
+    --sona-green-bright: #8FD16A;
+    --sona-mint: #F5F8F3;
+
+    --sona-text: #000000;
+    --sona-text-2: #3A3F3A;
+    --sona-muted: #4A4F4A;
+    --sona-on-dark: #D6E4D3;
+    --sona-on-black: #BFC7BD;
+    --sona-on-black-2: #9AA398;
+
+    --sona-border: #DDE6DA;
+    --sona-border-soft: #E3EBE0;
+    --sona-border-input: #D5DED2;
+    --sona-divider: #EEF2EC;
+    --sona-track: #E6EEE3;
+
+    --sona-font-display: "Amiri", "Times New Roman", serif;
+    --sona-font-body: "IBM Plex Sans Arabic", Tahoma, "Segoe UI", sans-serif;
+
+    --sona-radius: 6px;
+    --sona-gutter: clamp(16px, 5.5vw, 80px);
+
+    /* Tutor LMS tokens → palette */
+    --tutor-font-family-body: var(--sona-font-body);
+    --tutor-font-family-heading: var(--sona-font-display);
+    --tutor-color-primary: var(--sona-green);
+    --tutor-color-primary-hover: var(--sona-green-dark);
+    --tutor-text-brand: var(--sona-green);
+    --tutor-body-color: var(--sona-text);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+body.sona {
+    background: var(--sona-white);
+    color: var(--sona-text);
+    font-family: var(--sona-font-body);
+}
+body.sona h1, body.sona h2, body.sona h3,
+body.sona .entry-title {
+    font-family: var(--sona-font-display);
+    color: var(--sona-green-dark);
+    font-weight: 700;
+}
+body.sona a { color: var(--sona-green); text-decoration: none; }
+body.sona a:hover { color: var(--sona-green-dark); }
+
+.sona-wrap { max-width: 1440px; margin-inline: auto; padding-inline: var(--sona-gutter); box-sizing: border-box; }
+.sona-muted { color: var(--sona-muted); }
+.sona-small { font-size: 14px; }
+.sona-body2 { color: var(--sona-text-2); line-height: 1.8; margin: 0; }
+
+/* Buttons */
+.sona-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 44px; padding: 0 22px; box-sizing: border-box;
+    border: 1.5px solid transparent; border-radius: var(--sona-radius);
+    font: 600 15px/1 var(--sona-font-body); white-space: nowrap; cursor: pointer;
+    transition: background-color .15s, color .15s, border-color .15s;
+}
+body.sona .sona-btn--primary { background: var(--sona-green); color: var(--sona-white); }
+body.sona .sona-btn--primary:hover { background: var(--sona-green-dark); color: var(--sona-white); }
+body.sona .sona-btn--outline { background: var(--sona-white); border-color: var(--sona-black); color: var(--sona-black); font-weight: 500; }
+body.sona .sona-btn--outline:hover { background: var(--sona-black); color: var(--sona-white); }
+body.sona .sona-btn--ghost { background: transparent; color: var(--sona-black); font-weight: 500; }
+body.sona .sona-btn--ghost:hover { color: var(--sona-green); }
+body.sona .sona-btn--dark { background: var(--sona-black); color: var(--sona-white); border: 0; }
+body.sona .sona-btn--dark:hover { background: var(--sona-green-dark); }
+.sona-btn--lg { height: 56px; padding: 0 32px; font-size: 17px; }
+.sona-btn--block { width: 100%; }
+.sona-btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+.sona-link { font-weight: 600; font-size: 16px; }
+body.sona .sona-link--light { color: var(--sona-green-bright); }
+body.sona .sona-link--light:hover { color: var(--sona-white); }
+
+.sona-avatar {
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    border-radius: 50%; background: var(--sona-green-dark); color: var(--sona-white); font-weight: 600;
+}
+.sona-avatar--sm { width: 36px; height: 36px; font-size: 15px; }
+.sona-avatar--lg { width: 96px; height: 96px; font: 400 44px/1 var(--sona-font-display); }
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.sona-header { background: var(--sona-white); border-bottom: 1px solid var(--sona-border-soft); position: relative; z-index: 50; }
+.sona-header__inner {
+    max-width: 1440px; margin-inline: auto; padding-inline: var(--sona-gutter); box-sizing: border-box;
+    min-height: 96px; display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.sona-brand { display: flex; align-items: center; gap: 14px; }
+.sona-brand__logo { width: 84px; height: 58px; object-fit: contain; }
+.sona-brand__text { display: flex; flex-direction: column; gap: 2px; }
+.sona-brand__name { font: 700 30px/1 var(--sona-font-display); color: var(--sona-green-dark); }
+.sona-brand__tag { font-size: 13px; color: var(--sona-muted); }
+
+.sona-header__menu { flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.sona-nav { flex: 1; display: flex; justify-content: center; }
+.sona-nav__list { list-style: none; margin: 0; padding: 0; display: flex; gap: 36px; }
+body.sona .sona-nav__list a { color: var(--sona-black); font-size: 16px; font-weight: 500; }
+body.sona .sona-nav__list a:hover,
+body.sona .sona-nav__list .current-menu-item > a { color: var(--sona-green); }
+.sona-header__actions { display: flex; align-items: center; gap: 12px; }
+
+.sona-lang {
+    height: 44px; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px;
+    background: var(--sona-white); border: 1px solid var(--sona-border-input); border-radius: var(--sona-radius);
+    font: 400 14px var(--sona-font-body); color: var(--sona-black); cursor: pointer;
+}
+.sona-lang:hover { background: var(--sona-mint); color: var(--sona-black); }
+body.sona .sona-user-pill {
+    height: 48px; padding-block: 0; padding-inline: 8px 16px; display: inline-flex; align-items: center; gap: 10px;
+    border: 1px solid var(--sona-border-input); border-radius: 24px; color: var(--sona-black); font-size: 15px;
+}
+
+.sona-nav-toggle {
+    display: none; width: 44px; height: 44px; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--sona-border-input); border-radius: var(--sona-radius);
+    color: var(--sona-black); padding: 0; cursor: pointer;
+}
+.sona-nav-toggle:hover, .sona-nav-toggle:focus { background: var(--sona-mint); color: var(--sona-black); }
+
+@media (max-width: 1180px) {
+    .sona-nav__list { gap: 22px; }
+    .sona-brand__tag { display: none; }
+}
+@media (max-width: 1024px) {
+    .sona-header__inner { min-height: 76px; flex-wrap: wrap; }
+    .sona-brand__logo { width: 64px; height: 44px; }
+    .sona-brand__name { font-size: 26px; }
+    .sona-nav-toggle { display: inline-flex; }
+    .sona-header__menu {
+        display: none; flex-basis: 100%; flex-direction: column; align-items: stretch;
+        padding-bottom: 20px; gap: 16px;
+    }
+    .sona-header__menu.is-open { display: flex; }
+    .sona-nav { justify-content: flex-start; }
+    .sona-nav__list { flex-direction: column; gap: 0; width: 100%; }
+    .sona-nav__list a { display: block; padding: 12px 0; border-bottom: 1px solid var(--sona-divider); }
+    .sona-header__actions { flex-wrap: wrap; }
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.sona-footer {
+    background: var(--sona-black); color: var(--sona-white);
+    padding: 56px var(--sona-gutter) 32px; display: flex; flex-direction: column; gap: 40px;
+}
+.sona-footer__top, .sona-footer__bottom { max-width: calc(1440px - 2 * 80px); width: 100%; margin-inline: auto; }
+.sona-footer__top { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
+.sona-footer__brand { display: flex; flex-direction: column; gap: 12px; }
+.sona-footer__name { font: 700 32px/1.2 var(--sona-font-display); }
+.sona-footer__desc { font-size: 15px; color: var(--sona-on-black); }
+.sona-footer__cols { display: flex; gap: 72px; font-size: 15px; flex-wrap: wrap; }
+.sona-footer__col { display: flex; flex-direction: column; gap: 12px; color: var(--sona-on-black); }
+.sona-footer__title { font-weight: 600; color: var(--sona-white); }
+body.sona .sona-footer a { color: var(--sona-on-black); }
+body.sona .sona-footer a:hover { color: var(--sona-green-bright); }
+.sona-footer__bottom {
+    padding-top: 20px; border-top: 1px solid #2A2A2A;
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-size: 13px; color: var(--sona-on-black-2);
+}
+body.sona .sona-footer__bottom a { color: var(--sona-on-black-2); }
+
+/* ==========================================================================
+   Home
+   ========================================================================== */
+.sona-front #content > .ast-container,
+.sona-front .site-content > .ast-container { max-width: none; padding: 0; display: block; }
+body.sona-front #primary.sona-home { width: 100%; margin: 0; padding: 0; }
+
+.sona-hero { background: var(--sona-mint); overflow: hidden; }
+.sona-hero__inner { position: relative; min-height: 580px; display: flex; align-items: center; padding-block: 72px; }
+.sona-hero__copy { position: relative; z-index: 1; max-width: 640px; display: flex; flex-direction: column; gap: 28px; }
+body.sona .sona-hero__title {
+    margin: 0; font: 700 clamp(44px, 5vw, 72px)/1.25 var(--sona-font-display); color: var(--sona-green-dark);
+}
+.sona-hero__lead { margin: 0; max-width: 560px; font-size: 20px; line-height: 1.9; color: var(--sona-text-2); }
+.sona-hero__cta { display: flex; gap: 14px; flex-wrap: wrap; }
+.sona-hero__art {
+    position: absolute; inset-inline-end: -60px; top: 40px;
+    width: min(760px, 55%); height: auto; aspect-ratio: 760 / 526; object-fit: contain;
+    transform: scaleX(-1); pointer-events: none;
+}
+@media (max-width: 900px) {
+    .sona-hero__inner { min-height: 0; flex-direction: column; align-items: stretch; padding-block: 48px 0; }
+    .sona-hero__art { position: static; width: 100%; max-width: 520px; margin: 8px auto 0; }
+    .sona-hero__lead { font-size: 17px; }
+}
+
+.sona-subjects { padding-block: 96px 88px; display: flex; flex-direction: column; gap: 44px; }
+.sona-section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+body.sona .sona-h2 { margin: 0; font: 700 clamp(32px, 3.4vw, 46px)/1.3 var(--sona-font-display); color: var(--sona-black); }
+body.sona .sona-h2--light { color: var(--sona-white); font-size: clamp(30px, 3vw, 42px); }
+.sona-section-head__sub { margin: 10px 0 0; font-size: 18px; color: var(--sona-muted); }
+
+.sona-subjects__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+@media (max-width: 1100px) { .sona-subjects__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px)  { .sona-subjects__grid { grid-template-columns: 1fr; } }
+
+body.sona .sona-subject-card {
+    min-height: 210px; box-sizing: border-box; padding: 28px 26px;
+    display: flex; flex-direction: column; gap: 12px;
+    background: var(--sona-white); border: 1px solid var(--sona-border); border-top: 4px solid var(--sona-green);
+    border-radius: 4px; color: var(--sona-black);
+    transition: box-shadow .15s, transform .15s;
+}
+body.sona a.sona-subject-card:hover { box-shadow: 0 10px 28px rgba(28, 74, 36, .12); transform: translateY(-2px); color: var(--sona-black); }
+.sona-subject-card__name { font: 700 30px/1.3 var(--sona-font-display); color: var(--sona-green-dark); }
+.sona-subject-card__desc { font-size: 15px; line-height: 1.8; color: var(--sona-text-2); }
+body.sona .sona-subject-card--dark { background: var(--sona-black); border: 0; justify-content: space-between; }
+.sona-subject-card__promo { font: 400 28px/1.5 var(--sona-font-display); color: var(--sona-white); }
+
+.sona-steps { background: var(--sona-green-dark); padding-block: 80px; }
+.sona-steps .sona-wrap { display: flex; flex-direction: column; gap: 48px; }
+.sona-steps__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+@media (max-width: 900px) { .sona-steps__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .sona-steps__grid { grid-template-columns: 1fr; } }
+.sona-step { display: flex; flex-direction: column; gap: 12px; padding-top: 20px; border-top: 1px solid #4E7A55; }
+.sona-step__n { font: 400 40px/1 var(--sona-font-display); color: var(--sona-green-bright); }
+.sona-step__title { font-size: 20px; font-weight: 600; color: var(--sona-white); }
+.sona-step__desc { font-size: 15px; line-height: 1.8; color: var(--sona-on-dark); }
+
+/* ==========================================================================
+   Cards, progress, schedule (shared by profile + pages)
+   ========================================================================== */
+.sona-card {
+    box-sizing: border-box; padding: 24px 28px;
+    background: var(--sona-white); border: 1px solid var(--sona-border); border-radius: var(--sona-radius);
+    display: flex; flex-direction: column; gap: 14px;
+}
+body.sona .sona-card__title { margin: 0; font: 600 18px/1.4 var(--sona-font-body); color: var(--sona-black); }
+
+.sona-progress { height: 8px; background: var(--sona-track); border-radius: 4px; overflow: hidden; }
+.sona-progress > span { display: block; height: 100%; background: var(--sona-green); border-radius: inherit; }
+.sona-progress--light { width: 260px; max-width: 100%; height: 10px; background: #3C6B44; border-radius: 5px; }
+.sona-progress--light > span { background: var(--sona-green-bright); }
+
+.sona-schedule { display: flex; flex-direction: column; gap: 14px; }
+.sona-schedule__day { display: flex; flex-direction: column; gap: 6px; }
+.sona-schedule__dayname { font-size: 14px; font-weight: 600; color: var(--sona-green); }
+.sona-schedule__row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.sona-schedule__note { font-size: 13px; color: var(--sona-muted); padding-top: 10px; border-top: 1px solid var(--sona-divider); }
+
+.sona-schedule-table { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.sona-schedule-table__day {
+    padding: 20px 22px; border: 1px solid var(--sona-border); border-top: 4px solid var(--sona-green);
+    border-radius: 4px; background: var(--sona-white); display: flex; flex-direction: column; gap: 10px;
+}
+body.sona .sona-schedule-table__day h3 { margin: 0 0 4px; font-size: 24px; }
+.sona-schedule-table .sona-schedule__row { font-size: 16px; }
+
+/* ==========================================================================
+   Student profile (Tutor dashboard home)
+   ========================================================================== */
+.sona-profile { display: flex; flex-direction: column; gap: 28px; color: var(--sona-black); font-family: var(--sona-font-body); }
+.sona-profile__head { display: flex; flex-direction: column; gap: 6px; }
+.sona-crumbs { font-size: 14px; color: var(--sona-muted); }
+body.sona .sona-profile__title { margin: 0; font: 700 44px/1.2 var(--sona-font-display); color: var(--sona-green-dark); }
+
+.sona-profile__grid { display: grid; grid-template-columns: 300px minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+/* Sized by the space Tutor's dashboard gives us, not the viewport. */
+.sona-profile { container-type: inline-size; }
+@container (max-width: 1100px) {
+    .sona-profile__grid { grid-template-columns: 280px minmax(0, 1fr); }
+    .sona-profile__grid > .sona-profile__side:last-child { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+}
+@container (max-width: 720px) {
+    .sona-profile__grid { grid-template-columns: minmax(0, 1fr); }
+    .sona-course-row { flex-direction: column; align-items: stretch; }
+}
+.sona-profile__side, .sona-profile__main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.sona-profile__main { gap: 16px; }
+
+.sona-idcard { align-items: center; padding: 28px; }
+.sona-idcard__name { font-size: 20px; font-weight: 600; }
+.sona-idcard__meta { width: 100%; margin: 0; padding-top: 14px; border-top: 1px solid var(--sona-border-soft); display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.sona-idcard__meta > div { display: flex; justify-content: space-between; gap: 12px; }
+.sona-idcard__meta dt { color: var(--sona-muted); font-weight: 400; }
+.sona-idcard__meta dd { margin: 0; }
+
+.sona-grades { display: flex; flex-direction: column; }
+.sona-grades__row { min-height: 44px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--sona-divider); font-size: 15px; }
+.sona-grades__row:last-child { border-bottom: 0; }
+.sona-grades__score { font-weight: 600; color: var(--sona-green-dark); }
+
+.sona-welcome {
+    padding: 28px 32px; background: var(--sona-green-dark); border-radius: var(--sona-radius);
+    display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+}
+.sona-welcome__text { display: flex; flex-direction: column; gap: 8px; }
+.sona-welcome__title { font: 700 30px/1.3 var(--sona-font-display); color: var(--sona-white); }
+.sona-welcome__sub { font-size: 15px; color: var(--sona-on-dark); }
+
+.sona-course-row { flex-direction: row; align-items: center; gap: 24px; padding: 22px 26px; }
+.sona-course-row__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.sona-course-row__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.sona-course-row__name { font: 700 26px/1.3 var(--sona-font-display); color: var(--sona-green-dark); }
+
+.sona-cert {
+    height: 180px; border: 1px solid var(--sona-border); border-radius: 4px; background: var(--sona-mint);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+}
+.sona-cert img { width: 80px; height: 55px; object-fit: contain; }
+.sona-cert__label { font: 700 26px/1 var(--sona-font-display); color: var(--sona-green-dark); }
+
+/* ==========================================================================
+   Tutor LMS surfaces
+   ========================================================================== */
+body.sona .tutor-dashboard-layout,
+body.sona .tutor-dashboard-body { background: var(--sona-mint); }
+body.sona .tutor-btn-primary,
+body.sona .tutor-btn.tutor-btn-primary {
+    background-color: var(--sona-green); border-color: var(--sona-green);
+}
+body.sona .tutor-btn-primary:hover { background-color: var(--sona-green-dark); border-color: var(--sona-green-dark); }
+body.sona .tutor-course-name a,
+body.sona .tutor-course-details-title { font-family: var(--sona-font-display); color: var(--sona-green-dark); }
+body.sona .tutor-card { border-color: var(--sona-border); }
+
+/* Generic pages */
+body.sona:not(.sona-front) .site-content { background: var(--sona-white); }
+body.sona .entry-content { font-size: 17px; line-height: 1.9; color: var(--sona-text-2); }
