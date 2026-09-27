@@ -1,0 +1,5 @@
+# LOCAL ONLY — loaded automatically by "docker compose up"
+services:
+  wordpress:
+    ports:
+      - "8080:80"   # open http://localhost:8080
